@@ -3,6 +3,7 @@ import essentia.standard as es
 import numpy as np
 import matplotlib.pyplot as plt
 
+#Testing spectrums
 M = 1024
 
 loader = essentia.standard.MonoLoader(filename = './audio/vco1_0.0_saw-sqr+.wav', sampleRate = 44100)

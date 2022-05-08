@@ -38,7 +38,7 @@ plt.xlim([0, 500])
 plt.xlabel('Time')
 plt.ylabel('Amplitude')
 plt.title("Time Domain Signal:")
-plt.savefig("Original_Signal_Time_Domain.png") 
+plt.savefig("./pics/Original_Signal_Time_Domain.png") 
 
 # Audio Synth plot
 plt.clf()
@@ -47,7 +47,7 @@ plt.xlim([0, 500])
 plt.xlabel('Time')
 plt.ylabel('Amplitude')
 plt.title("Time Domain Signal:")
-plt.savefig("Synth_Signal_Time_Domain.png")
+plt.savefig("./pics/Synth_Signal_Time_Domain.png")
 
 
 
