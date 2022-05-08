@@ -3,7 +3,7 @@ import essentia.standard as es
 import numpy as np
 import matplotlib.pyplot as plt
 
-params = { 'frameSize': 128, 'hopSize': 512, 'startFromZero': False, 'sampleRate': 48000,'maxnSines': 10000,'magnitudeThreshold': -100,'minSineDur': 0.02,'freqDevOffset': 10, 'freqDevSlope': 0.001}
+params = { 'frameSize': pow(2,5), 'hopSize': 512, 'startFromZero': False, 'sampleRate': 48000,'maxnSines': 10000,'magnitudeThreshold': -100,'minSineDur': 0.02,'freqDevOffset': 10, 'freqDevSlope': 0.001}
 
 loader = es.MonoLoader(filename = './audio/vco1_5_tri.wav', sampleRate = params['sampleRate'])
 fcut = es.FrameCutter(frameSize = params['frameSize'], hopSize = params['hopSize'], startFromZero =  True)
