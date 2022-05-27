@@ -8,7 +8,7 @@ import numpy as np
 import sys
 
 # algorithm parameters
-params = { 'frameSize': pow(2,16), 'hopSize': pow(2,9), 'startFromZero': False, 'sampleRate': 48000,'maxnSines': 10000,'magnitudeThreshold': -2000,'minSineDur': 0.002,'freqDevOffset': 10, 'freqDevSlope': 0.000001}
+params = { 'frameSize': pow(2,16), 'hopSize': pow(2,10), 'startFromZero': False, 'sampleRate': 48000,'maxnSines': 10000,'magnitudeThreshold': -2000,'minSineDur': 0.002,'freqDevOffset': 10, 'freqDevSlope': 0.000001}
 
 loader = es.MonoLoader(filename = './audio/sine.wav', sampleRate = params['sampleRate'])
 fcut = es.FrameCutter(frameSize = params['frameSize'], hopSize = params['hopSize'], startFromZero =  True)

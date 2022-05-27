@@ -8,7 +8,7 @@ import numpy as np
 import sys
 
 # algorithm parameters
-params = { 'frameSize': pow(2,10), 'hopSize': pow(2,1), 'startFromZero': False, 'sampleRate': 48000,'maxnSines': 10000,'magnitudeThreshold': -2000,'minSineDur': 0.02,'freqDevOffset': 10, 'freqDevSlope': 0.0001}
+params = { 'frameSize': pow(2,14), 'hopSize': pow(2,1), 'startFromZero': False, 'sampleRate': 48000,'maxnSines': 10000,'magnitudeThreshold': -2000,'minSineDur': 0.02,'freqDevOffset': 10, 'freqDevSlope': 0.0001}
 
 loader = es.MonoLoader(filename = './audio/sine.wav', sampleRate = params['sampleRate'])
 fcut = es.FrameCutter(frameSize = params['frameSize'], hopSize = params['hopSize'], startFromZero =  True)
@@ -27,7 +27,7 @@ tunner_freq, conf = pitch (spec)
 h_freq, h_mag, h_ph = harmon(fft, tunner_freq)
 
 print(tunner_freq)
-print(h_freq)
+#print(h_freq)
 
 
 # Harmonics plot
