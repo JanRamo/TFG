@@ -1,27 +1,22 @@
-from curses import def_prog_mode
 from fileinput import filename
-from locale import normalize
-from blinker import Signal
 import essentia.standard as es
 import numpy as np
 import matplotlib.pyplot as plt
 import json
-from genericpath import exists
 from os import path
 from matplotlib.ticker import MaxNLocator
 
 SignalData = []
-filename = 'data_vco1_tri.json'
-    
-    # Write the initial json object (list of dicts)
+filename = 'json files/data_vco2_tri.json'
 with open(filename, mode='w') as f:
     json.dump(SignalData, f)
 
+#Calculates SineModelAnal, HarmonicModelAnal, Harmonics numbers & relation between them.
 def SineModelAnalFunc(sampleDir, signalName):
     sampleDir = sampleDir
     signalName = signalName
-    print(signalName)
-   
+    
+    #Initial Parameters for Algorithms
     params = {
         "frameSize": 2**15,
         "hopSize": 512,
@@ -35,9 +30,11 @@ def SineModelAnalFunc(sampleDir, signalName):
     }
     #print(f"Parameters: {params}")
 
+    #Load de recording sample given the path 
     loader = es.MonoLoader(
         filename = str(sampleDir), sampleRate=params["sampleRate"]
     )
+    
     fcut = es.FrameCutter(
         frameSize=params["frameSize"], hopSize=params["hopSize"], startFromZero=True
     )
@@ -69,39 +66,59 @@ def SineModelAnalFunc(sampleDir, signalName):
     win = w(frame)
     fft_frame = fft(win)
     sineFrequencies, sineMagnitudes, sinePhases = SineModel(fft_frame)
-    pitch = sineFrequencies[0]
-    harmonicFrequencies, harmonicMagnitudes, harmonicPhases = HarmonicModel(fft_frame, pitch)
+    fundamentalFrequency = sineFrequencies[0]
+    harmonicFrequencies, harmonicMagnitudes, harmonicPhases = HarmonicModel(fft_frame, fundamentalFrequency)
+
+    fundamentalFrequency = np.float(fundamentalFrequency)
+    period = 1/fundamentalFrequency
     
-    SignalData = [
-            {
-            
-                "Signal Name": str(signalName), 
-                "Pitch Frequency": str(pitch),
-                "Harmonics": str(harmonicFrequencies),
-                "Magnitud": str(harmonicMagnitudes),
-                "Phase": str(harmonicPhases)   
-            }
-    ]
-    pitch = np.float(pitch)
-    period = 1/pitch
+    #Converting array to list for JSON file
     sineFrequenciesList = sineFrequencies.tolist()
     sineMagnitudesList = sineMagnitudes.tolist()
     sinePhasesList = sinePhases.tolist()
     harmonicFrequenciesList = harmonicFrequencies.tolist()
     harmonicMagnitudesList = harmonicMagnitudes.tolist()
-    harmonicPhasesList = harmonicPhases.tolist()
+    harmonicPhasesList = harmonicPhases.tolist() 
 
+    #Rounding values for an aproximation
+    fundamentalFrequencyRounded = np.round(fundamentalFrequency)
+    sineFrequencies = np.round(np.array(sineFrequenciesList))
+    harmonicFrequencies = np.round(np.array(harmonicFrequenciesList))
+    harmonicMagnitudes = np.round(np.array(harmonicMagnitudesList))
+    harmonicPhases = np.array(harmonicPhasesList)
+
+    #Calculating harmonic number from harmonic frequency array
+    for x in harmonicFrequencies:
+        harmonicNumber = np.round(harmonicFrequencies/fundamentalFrequencyRounded)
+    harmonicNumberList = harmonicNumber.tolist()
+    #Relation between magnitudes
+    harmonicRelationList= []
+    for magnitud in harmonicMagnitudes:
+        harmonicRelationNumber = harmonicMagnitudes[0]/magnitud
+        harmonicRelationList.append(harmonicRelationNumber)
+
+    roundedRelationArray = np.round(harmonicRelationList,2)
+
+    # #Calculate harmonics from Fundamental Frecuency
+    # maxHarm = len(sineFrequencies)
+    # harm = np.empty(maxHarm)
+    # for j in range (0,maxHarm):
+    #     harm[j] = fundamentalFrequencyRounded*j
+
+    #Creating JSON file 
     with open(filename) as fp:
         listObj = json.load(fp)
     listObj.append({
                 "Signal Name": signalName, 
-                "Pitch Frequency": pitch,
+                "Pitch Frequency": fundamentalFrequency,
                 "Sine Frequency": sineFrequenciesList,
                 "Sine Magnitud": sineMagnitudesList,
                 "Sine Phase": sinePhasesList,
                 "Harmonics": harmonicFrequenciesList,
                 "Magnitud": harmonicMagnitudesList,
-                "Phase": harmonicPhasesList,   
+                "Phase": harmonicPhasesList,
+                "Harmonic Number": harmonicNumberList,
+                "Harmonic Relation": harmonicRelationList,
             })
     with open(filename, 'w') as json_file:
         # json.dumps(listObj)
@@ -121,33 +138,7 @@ def SineModelAnalFunc(sampleDir, signalName):
     # ifft_synth = ifft(out_frame)
     # print(ifft_synth)
 
-    # filename = 'data_vco1_tri.json'
-    # SignalData = []
-    # objectNumber = 3 
-    # # Check if file exists
-    # if path.isfile(filename) is False:
-    #     raise Exception("File not found")
-    
-    # # Read JSON file
-    # with open(filename) as fp:
-    #     SignalData = json.loads(fp.read())
 
-    pitchFrequency = np.round(pitch)
-    sineFrequencies = np.round(np.array(sineFrequenciesList))
-    harmonicFrequencies = np.round(np.array(harmonicFrequenciesList))
-    harmonicMagnitudes = np.round(np.array(harmonicMagnitudesList))
-    harmonicPhases = np.array(harmonicPhasesList)
-
-    maxHarm = len(sineFrequencies)
-
-    harm = np.empty(maxHarm)
-    for j in range (0,maxHarm):
-    #p = harmArray.append(j)
-        harm[j] = pitchFrequency*j
-
-    #print(harm)
-    print(harmonicFrequencies)
-    print(harmonicMagnitudes)
 
 # realHarm = []
 # for x in sineFrequencies:
@@ -160,19 +151,7 @@ def SineModelAnalFunc(sampleDir, signalName):
 #     if exist == False:
 #         print('cañita brava')
 
-    
-    for x in harmonicFrequencies:
-        harmonicNumber = np.round(harmonicFrequencies/pitchFrequency)
-
-    #Relation between magnitudes
-    relationArray= []
-    for magnitud in harmonicMagnitudes:
-        relationNumber  = harmonicMagnitudes[0]/magnitud
-        relationArray.append(relationNumber)
-
-    roundedRelationArray = np.round(relationArray,2)
-    print(roundedRelationArray)
-    print(harmonicNumber)
+#   Plotting
 
     _, ax = plt.subplots(3,1, figsize=(10, 10))
     frequency_stamps = np.linspace(0, params["sampleRate"] / 2, int(params["frameSize"]/ 2) + 1)
@@ -192,13 +171,13 @@ def SineModelAnalFunc(sampleDir, signalName):
 # ax[0].set_ylim([-120, -20])
     ax[2].bar(harmonicNumber, harmonicMagnitudes + 100, width=1, edgecolor="white", linewidth=0.7, bottom = -100)
     ax[2].set_xlabel("Harmonic Number")
-    ax[2].set_xlim([0, 40])
+    ax[2].set_xlim([0, 60])
     #ax[2].xaxis.set_major_locator(MaxNLocator(integer=True))
     ax[2].set_ylabel("Magnitude [dBFS]")
     # ax.set_ylim([-100, 0])
     ax[2].set_title("Harmonics of the Signal")
    
-    plt.suptitle("Analized Signal: " + str(signalName) + "\nFundamental Frequency: " + str(pitchFrequency) + "Hz")
+    plt.suptitle("Analized Signal: " + str(signalName) + "\nFundamental Frequency: " + str(fundamentalFrequencyRounded) + "Hz")
     plt.tight_layout()
     plt.savefig('analisis pics/Analized_Signal_' + str(signalName) + '.png')
     plt.clf()
@@ -206,7 +185,7 @@ def SineModelAnalFunc(sampleDir, signalName):
 
     # compare peaks
     idx_max_in = np.argmax(np.abs(fft_frame)) #frequency_stamps[idx_max_in]
-    #print(f"Max peak in input frame: {pitch}[Hz]")
+    #print(f"Max peak in input frame: {fundamentalFrequecy}[Hz]")
 
     # Audio .wav plot
     plt.plot(frame)
