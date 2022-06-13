@@ -19,7 +19,7 @@ params = {
 print(f"Parameters: {params}")
 
 loader = es.MonoLoader(
-    filename="./audio/vco1_5_tri.wav", sampleRate=params["sampleRate"]
+    filename="/home/pabblo/tfgvco/Kobol_vco_samples/MUESTRA VCO1 KOBOL EXPANDER/Triangular/vco1_5.5_tri.wav", sampleRate=params["sampleRate"]
 )
 fcut = es.FrameCutter(
     frameSize=params["frameSize"], hopSize=params["hopSize"], startFromZero=True
