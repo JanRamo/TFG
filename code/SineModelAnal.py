@@ -22,12 +22,12 @@ def SineModelAnal(sampleDir, signalName):
         "hopSize": 512,
         "startFromZero": False,
         "sampleRate": 48000,
-        "maxnSines": 300,
+        "maxnSines": 800,
         "magnitudeThreshold": -75,
         "minSineDur": 0.02,
         "freqDevOffset": 0.1,
         "freqDevSlope": 0.1,
-        "maxPeaks": 300,
+        "maxPeaks": 800,
     }
     #print(f"Parameters: {params}")
 
@@ -59,6 +59,7 @@ def SineModelAnal(sampleDir, signalName):
     frame = audio[1*params["sampleRate"] : 1*params["sampleRate"] + params["frameSize"]] #fcut(audio)  # audio[0*44100 : 0*44100 + 2048]
     win = w(frame)
     fft_frame = fft(win)
+    fft_frame = fft_frame/np.linalg.norm(fft_frame)
     sineFrequencies, sineMagnitudes, sinePhases = SineModel(fft_frame)
     fundamentalFrequency = sineFrequencies[0]
 
