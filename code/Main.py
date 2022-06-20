@@ -1,8 +1,8 @@
 import pathlib
-import SineModelAnal, FreqDesvCalc, SNR, SPRModel, HarmonicModel, RMS, THD #WaveShaperPlot, SineModelSynth
+import SineModelAnal, FreqDesvCalc,  SPRModel, HarmonicModel, RMS# THD WaveShaperPlot, SineModelSynth
 
 #Sample directory
-rootDir = '/home/pabblo/tfgvco/Kobol_vco_samples/MUESTRA VCO1 KOBOL EXPANDER'
+rootDir = '/home/pabblo/tfgvco/Kobol_vco_samples/MUESTRA VCO2 KOBOL EXPANDER'
 folder = pathlib.Path(rootDir)
 count = 0
 waveformDir = []
@@ -11,13 +11,11 @@ for waveform in folder.iterdir():
     waveformDir = pathlib.Path(waveform)
     # print(waveform)
     for sample in waveformDir.iterdir():
-      if sample.name.startswith('pul') and sample.name.endswith('.wav'):
+      if sample.name.startswith('vco2') and sample.name.endswith('.wav'):
         sampleDir = pathlib.Path(sample)
         print('Analizing', sample.name)
         # SineModelAnal.SineModelAnal(sampleDir, sample.name)
         # FreqDesvCalc.FreqDesvCalc(sampleDir, sample.name)
-        # WaveShaperPlot.WaveShaperPlot(sampleDir, sample.name)
-        # SNR.SNRCalc(sampleDir, sample.name)
         # SPRModel.SPRModelCalc(sampleDir, sample.name)
         HarmonicModel.HarmonicModelAnal(sampleDir, sample.name)
         # RMS.RMSCalc(sampleDir, sample.name)

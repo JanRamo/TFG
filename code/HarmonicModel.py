@@ -7,7 +7,7 @@ from os import path
 from matplotlib.ticker import MaxNLocator
 
 SignalData = []
-filename = 'json files/HarmonicData_vco1_tri.json'
+filename = 'json files/VCO2_data.json'
 with open(filename, mode='w') as f:
     json.dump(SignalData, f)
 fundamentalFreqDesv = []
@@ -34,6 +34,7 @@ def HarmonicModelAnal(sampleDir, signalName):
     loader = es.MonoLoader(
         filename = str(sampleDir), sampleRate=params["sampleRate"]
     )
+    
     fcut = es.FrameCutter(
         frameSize=params["frameSize"], hopSize=params["hopSize"], startFromZero=True
     )
@@ -61,7 +62,7 @@ def HarmonicModelAnal(sampleDir, signalName):
     )
     ifft = es.IFFT(size=params["frameSize"], normalize=False)
     overl = es.OverlapAdd(frameSize=params["frameSize"], hopSize=params["hopSize"])
-
+    rms = es.RMS()
     audio = loader()
     frame = audio[1*params["sampleRate"] : 1*params["sampleRate"] + params["frameSize"]] #fcut(audio)  # audio[0*44100 : 0*44100 + 2048]
     win = w(frame)
@@ -118,6 +119,8 @@ def HarmonicModelAnal(sampleDir, signalName):
         maxHarm = max(harmonicFrequencies)
         totHarm = np.count_nonzero(harmonicFrequencies)
 
+        rmsAudio = np.round(rms(audio),5)
+
         print("Harmonico Menor (Fundamental):", minHarm)
         print("Harmonico Máximo:", maxHarm)
         print("Numero de harmonicos:", totHarm)
@@ -133,6 +136,9 @@ def HarmonicModelAnal(sampleDir, signalName):
                     "Harmonic Phase": harmonicPhasesList,
                     "Harmonic Number": harmonicNumberList,
                     "Harmonic Relation": harmonicRelationList,
+                    "Number of Harmonics": totHarm,
+                    "THD": thd,
+                    "RMS": rmsAudio,
                 })
         with open(filename, 'w') as json_file:
             # json.dumps(listObj)
